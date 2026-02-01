@@ -29,29 +29,26 @@ echo "--- 系统检查通过：Debian $VERSION_ID_SHORT ---"
 # 2. 设置密码（用于 root 和 azureuser）
 echo "--- 步骤 2: 设置登录密码 ---"
 while true; do
-    read -s -p "请输入要设置的新密码: " NEW_PASS
+    # 强制从终端读取输入
+    read -s -p "请输入要设置的root密码: " NEW_PASS < /dev/tty
     echo
-    read -s -p "请再次输入确认密码: " NEW_PASS_CONFIRM
+    read -s -p "请再次输入确认root密码: " NEW_PASS_CONFIRM < /dev/tty
     echo
     if [ "$NEW_PASS" == "$NEW_PASS_CONFIRM" ] && [ -n "$NEW_PASS" ]; then
         break
     else
-        echo "两次密码不一致或密码为空，请重新输入。"
+        echo "两次root密码不一致或密码为空，请重新输入。"
     fi
 done
 
-# 修改 root 密码
-echo "root:$NEW_PASS" | chpasswd
-echo "Root 密码设置成功！"
-
-# 3. 判断并修改 azureuser 密码
+# 3. 同步 azureuser 密码
 echo "--- 步骤 3: 同步默认用户密码 ---"
 if id "azureuser" &>/dev/null; then
     echo "检测到 azureuser 用户，正在同步密码..."
     echo "azureuser:$NEW_PASS" | chpasswd
-    AZURE_USER_STATUS="密码已同步（与root一致）"
+    AZURE_USER_STATUS="密码已同步"
 else
-    AZURE_USER_STATUS="未检测到该用户，跳过"
+    AZURE_USER_STATUS="未检测到该用户"
 fi
 
 # 4. 修改 SSH 配置
