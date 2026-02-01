@@ -41,6 +41,10 @@ while true; do
     fi
 done
 
+# 修改 root 密码
+echo "root:$NEW_PASS" | chpasswd
+echo "Root 密码设置成功！"
+
 # 3. 同步 azureuser 密码
 echo "--- 步骤 3: 同步默认用户密码 ---"
 if id "azureuser" &>/dev/null; then
@@ -73,7 +77,7 @@ echo "操作系统：Debian $VERSION_ID"
 echo "SSH 状态：已开启 root 密码登录"
 echo "Root 密码：$NEW_PASS"
 echo "Azure 账户 (azureuser)：$AZURE_USER_STATUS"
-if [[ "$AZURE_USER_STATUS" != "未检测到该用户，跳过" ]]; then
+if [[ "$AZURE_USER_STATUS" != "未检测到该用户" ]]; then
     echo "Azure 账户密码：$NEW_PASS"
 fi
 echo "================================================"
